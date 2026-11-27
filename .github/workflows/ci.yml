@@ -1,0 +1,27 @@
+name: Verification
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: cargo test --locked
+      - run: cargo build --locked
+      - run: python scripts/regression.py
+      - name: Configure native C17 tests
+        run: cmake -S native -B target/native-tests -DCMAKE_BUILD_TYPE=Debug
+      - name: Build native tests
+        run: cmake --build target/native-tests --config Debug
+      - name: Run native tests
+        run: ctest --test-dir target/native-tests -C Debug --output-on-failure

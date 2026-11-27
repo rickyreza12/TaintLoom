@@ -1,0 +1,10 @@
+/target/
+/native_test.exe
+/benchmarks/results/
+/.codeql-db/
+__pycache__/
+*.pyc
+*.profraw
+*.profdata
+/fuzz/artifacts/
+/fuzz/corpus/

@@ -1,0 +1,14 @@
+{
+  "rules": [
+    {
+      "symbol": "load_private_record",
+      "kind": "source_sensitive",
+      "severity": "high"
+    },
+    {
+      "symbol": "publish_record",
+      "kind": "sink_disclosure",
+      "severity": "high"
+    }
+  ]
+}

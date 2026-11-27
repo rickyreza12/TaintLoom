@@ -1,0 +1,26 @@
+cmake_minimum_required(VERSION 3.16)
+project(taintloom_native LANGUAGES C)
+
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+
+add_library(taintloom_native STATIC src/taintloom.c)
+target_include_directories(taintloom_native PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+if(MSVC)
+  target_compile_options(taintloom_native PRIVATE /W4)
+else()
+  target_compile_options(taintloom_native PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+enable_testing()
+add_executable(taintloom_native_test tests/test_core.c)
+target_link_libraries(taintloom_native_test PRIVATE taintloom_native)
+add_test(NAME native_analysis COMMAND taintloom_native_test)
+
+option(TAINTLOOM_SANITIZERS "Enable AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
+if(TAINTLOOM_SANITIZERS AND NOT MSVC)
+  target_compile_options(taintloom_native PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer)
+  target_link_options(taintloom_native_test PRIVATE -fsanitize=address,undefined)
+  target_compile_options(taintloom_native_test PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer)
+endif()
